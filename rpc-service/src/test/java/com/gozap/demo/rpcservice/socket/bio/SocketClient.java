@@ -1,9 +1,6 @@
 package com.gozap.demo.rpcservice.socket.bio;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 
 /**
@@ -23,23 +20,29 @@ public class SocketClient {
 
         Socket socket = null;
         BufferedReader in = null;
-        PrintWriter out = null;
+        OutputStream out = null;
 
         try {
             socket = new Socket("127.0.0.1", port);
             //设置超时时间
             socket.setSoTimeout(10000);
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out = new PrintWriter(socket.getOutputStream(), true);
-            out.println("QUERY TIME ORDER");
+            out = socket.getOutputStream();
+            String message = "你好  server";
+            socket.getOutputStream().write(message.getBytes("UTF-8"));
+            socket.shutdownOutput();
             System.out.println("Send order 2 server succeed.");
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             String resp = in.readLine();
             System.out.println("Now is:" + resp);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             if (out != null) {
-                out.close();
+                try {
+                    out.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 out = null;
             }
             if (in != null) {

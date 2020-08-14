@@ -27,14 +27,12 @@ public class TimeServerHandler implements Runnable {
             in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
             out = new PrintWriter(this.socket.getOutputStream(), true);
             String currentTime = null;
-            String body = null;
+            byte[] bytes = new byte[1024];
+            int len = 0;
             StringBuffer sb = new StringBuffer();
-            while (true) {
-                body = in.readLine();
-                if (body == null) {
-                    break;
-                }
-                sb.append(body);
+            while ((len = socket.getInputStream().read(bytes)) != -1) {
+                //注意指定编码格式，发送方和接收方一定要统一，建议使用UTF-8
+                sb.append(new String(bytes, 0, len,"UTF-8"));
             }
             System.out.println("The time server receive order:" + sb.toString());
             currentTime = new Date(System.currentTimeMillis()).toString() ;
@@ -56,6 +54,7 @@ public class TimeServerHandler implements Runnable {
             if (this.socket != null) {
                 try {
                     this.socket.close();
+                    System.out.println("TimeServerHandler socket close");
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
